@@ -91,11 +91,8 @@ class _AbstractPaginator(View, ABC):
             self.last_page.disabled = self.next_page.disabled = False
 
     async def _show_page(self, page_number: int) -> None:
-        if page_number < 0:
+        if page_number < 0 or page_number >= len(self.pages):
             return
-        elif page_number >= len(self.pages):
-            return
-
         self.current_page = page_number
         em = Embed(description=self.pages[self.current_page])
 
@@ -257,16 +254,15 @@ class TextPaginator(_AbstractPaginator):
     def get_pages(self):
         text = self.text
         while True:
-            if len(text) != 0:
-                new_text = text[0:self.breakpoint]
-                if self.prefix:
-                    new_text = self.prefix + "\n" + new_text
-                if self.suffix:
-                    new_text = new_text + "\n" + self.suffix
-                text = text[self.breakpoint:]
-                self.pages.append(new_text)
-            else:
+            if len(text) == 0:
                 break
+            new_text = text[:self.breakpoint]
+            if self.prefix:
+                new_text = self.prefix + "\n" + new_text
+            if self.suffix:
+                new_text = new_text + "\n" + self.suffix
+            text = text[self.breakpoint:]
+            self.pages.append(new_text)
 
 
 class LinePaginator(_AbstractPaginator):
@@ -345,9 +341,8 @@ class LinePaginator(_AbstractPaginator):
 
     def get_pages(self):
         lines = []
-        line_index = 0
         page_index = 0
-        for line in self.lines:
+        for line_index, line in enumerate(self.lines):
             if len(line) > 4096:
                 raise LineTooLong(
                     f"Pxpected the line at index {line_index} to be less than 4096 characters"
@@ -364,13 +359,11 @@ class LinePaginator(_AbstractPaginator):
                 page_index += 1
                 self.pages.append(page)
                 lines = []
-            line_index += 1
-        else:
-            if lines:
-                page = self._lines_to_page(lines)
-                if len(page) > 4096:
-                    raise PageTooLong(
-                        f"Page at index {page_index} has to be less than 4096 characters. "
-                        "Please lessen the 'line_limit'"
-                    )
-                self.pages.append(page)
+        if lines:
+            page = self._lines_to_page(lines)
+            if len(page) > 4096:
+                raise PageTooLong(
+                    f"Page at index {page_index} has to be less than 4096 characters. "
+                    "Please lessen the 'line_limit'"
+                )
+            self.pages.append(page)

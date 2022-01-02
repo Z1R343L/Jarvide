@@ -85,10 +85,13 @@ class Jarvide(commands.Bot):
 
         list_of_commands = {c: [c.name, *c.aliases] for c in self.commands}
 
-        commands_in_message = list(filter(
-            lambda c: any([x in message_content.split() for x in c[1]]),
-            list_of_commands.items()
-        ))
+        commands_in_message = list(
+            filter(
+                lambda c: any(x in message_content.split() for x in c[1]),
+                list_of_commands.items(),
+            )
+        )
+
 
         if len(commands_in_message) != 1:
             return  # TODO: Maybe make the user know that they supplied too many commands?

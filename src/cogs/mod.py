@@ -33,7 +33,7 @@ class Mod(commands.Cog):
             await member.kick(reason=reason)
             await ctx.send(f"{member.mention} has been kicked.")
         else:
-            await ctx.send(f"Cancelled kick.")
+            await ctx.send('Cancelled kick.')
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -56,7 +56,7 @@ class Mod(commands.Cog):
             await member.ban(reason=reason)
             await ctx.send(f"{member.mention} has been banned.")
         else:
-            await ctx.send(f"Cancelled ban.")
+            await ctx.send('Cancelled ban.')
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
